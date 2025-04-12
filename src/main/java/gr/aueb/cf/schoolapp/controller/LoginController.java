@@ -1,15 +1,11 @@
 package gr.aueb.cf.schoolapp.controller;
 
 import gr.aueb.cf.schoolapp.authentication.AuthenticationProvider;
-import gr.aueb.cf.schoolapp.dao.ITeacherDAO;
 import gr.aueb.cf.schoolapp.dao.IUserDAO;
-import gr.aueb.cf.schoolapp.dao.TeacherDAOImpl;
 import gr.aueb.cf.schoolapp.dao.UserDAOImpl;
 import gr.aueb.cf.schoolapp.exceptions.UserDAOException;
 import gr.aueb.cf.schoolapp.dto.UserLoginDTO;
-import gr.aueb.cf.schoolapp.service.ITeacherService;
 import gr.aueb.cf.schoolapp.service.IUserService;
-import gr.aueb.cf.schoolapp.service.TeacherServiceImpl;
 import gr.aueb.cf.schoolapp.service.UserServiceImpl;
 import gr.aueb.cf.schoolapp.exceptions.UserNotFoundException;
 import jakarta.servlet.ServletException;
@@ -30,10 +26,8 @@ public class LoginController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-//        String isError = request.getParameter("isError");
-//        request.setAttribute("isError", isError == null ? "false" : "true");
 
-        request.getRequestDispatcher("WEB-INF/jsp/login.jsp").forward(request, response);
+        request.getRequestDispatcher("WEB-INF/jsp/login2.jsp").forward(request, response);
     }
 
     @Override
@@ -51,7 +45,7 @@ public class LoginController extends HttpServlet {
 
             if (!principleIsAuthenticated) {
                 request.setAttribute("error", "Invalid credentials");
-                request.getRequestDispatcher("/WEB-INF/jsp/login.jsp").forward(request, response);
+                request.getRequestDispatcher("/WEB-INF/jsp/login2.jsp").forward(request, response);
                 return;
             }
 
@@ -64,7 +58,7 @@ public class LoginController extends HttpServlet {
             if (oldSession != null) {
                 oldSession.invalidate(); // Destroy attacker's session
             }
-            HttpSession session = request.getSession(true);
+            HttpSession session = request.getSession(true);  // Create new one for address fixation attack
             session.setAttribute("authenticated", true);
             session.setAttribute("username", username);
             session.setAttribute("role", userService.getUserByUsername(username).getRoleType().name());
@@ -73,7 +67,8 @@ public class LoginController extends HttpServlet {
                 session.setMaxInactiveInterval(ADMIN_TIMEOUT);  // Admin get 30-min sessions
             }
 
-            response.sendRedirect(request.getContextPath() + "/school-app/dashboard");
+            //response.sendRedirect(request.getContextPath() + "/school-app/dashboard");
+            response.sendRedirect(request.getContextPath() + "/school-app/teachers/view");
 
 
 //                response.sendRedirect(request.getContextPath() + "/login?isError=true");
